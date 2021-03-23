@@ -1,0 +1,26 @@
+[
+  {
+    "name": "alarm",
+    "path": "/alarm",
+    "component": "/home/vetec/docker/my_docker/nodejs_mysql/frontend/pages/alarm.vue",
+    "chunkName": "pages/alarm"
+  },
+  {
+    "name": "dashboard",
+    "path": "/dashboard",
+    "component": "/home/vetec/docker/my_docker/nodejs_mysql/frontend/pages/dashboard.vue",
+    "chunkName": "pages/dashboard"
+  },
+  {
+    "name": "login",
+    "path": "/login",
+    "component": "/home/vetec/docker/my_docker/nodejs_mysql/frontend/pages/login.vue",
+    "chunkName": "pages/login"
+  },
+  {
+    "name": "index",
+    "path": "/",
+    "component": "/home/vetec/docker/my_docker/nodejs_mysql/frontend/pages/index.vue",
+    "chunkName": "pages/index"
+  }
+]

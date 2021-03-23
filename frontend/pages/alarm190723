@@ -1,0 +1,136 @@
+<template>
+	<div id="wrap">
+    <section>
+			<div id="Nav_title" class="m_hidden">
+				<h1>Alarm</h1>
+			</div>
+      <div class="alert_content">
+        <div class="row">
+          <div class="col-lg-12 alarm-box">
+              <dx-data-grid :data-source="lists" :show-borders="true" :allow-column-reordering="true" :allow-column-resizing="true">
+                <dx-column-chooser
+                  :enabled="true"
+                  mode="select"
+                />
+                <!-- <dx-column data-field="Priority" caption="State" cell-template="stateTemplate" alignment="center">
+                  <dx-lookup
+                      :data-source="stateData"
+                      display-expr="Name"
+                      value-expr="ID"
+                    />
+                </dx-column> -->
+                
+                <dx-column data-field="Priority" caption="State"  alignment="center"/>
+                <dx-column data-field="Description"/>
+                <dx-column data-field="Action"/>
+                <dx-column data-field="DayOfWeek" alignment="center" :hiding-priority="0"/>
+                <dx-column data-field="LogDate" caption="date" alignment="center" data-type="date" format="yyyy-MM-dd" sort-order="desc"/>
+                <dx-column data-field="LogTime" caption="time" alignment="center" data-type="time"  :hiding-priority="1" sort-order="desc"/>
+                <dx-header-filter :visible="true"/>
+                <dx-filter-row :visible="true"/>
+                <dx-paging :page-size="20"/>
+                <dx-export :enabled="true" :allow-export-selected-data="true" file-name="alert"/>
+                <dx-pager
+                  :show-page-size-selector="true"
+                  :allowed-page-sizes="pageSizes"
+                  :show-info="true"
+                />
+                  <!--<dx-search-panel :visible="true" :highlight-case-sensitive="true"/>
+                  <div
+                    slot="stateTemplate"
+                    slot-scope="{ data }"
+                  >
+                    <span v-if="data.value == 1">
+                      <span class="label label-warning">1단계</span>
+                    </span>
+                    <span v-if="data.value == 2">
+                      <span class="label label-danger">2단계</span>
+                    </span>
+                    <span v-if="data.value == 3">
+                      <span class="label label-danger">3단계</span>
+                    </span>
+                  </div>-->
+              </dx-data-grid>
+          </div>
+        </div>
+      </div>
+    </section> 
+	</div>
+</template>
+<script>
+import moment from 'moment'
+import axios from 'axios'
+import {DxDataGrid,DxFilterRow,DxHeaderFilter,DxPager,DxPaging,DxSummary,DxColumn,DxLookup,DxSearchPanel,DxExport,DxColumnChooser} from 'devextreme-vue/data-grid';
+import 'devextreme/dist/css/dx.common.css';
+import 'devextreme/dist/css/dx.light.compact.css';
+
+export default {
+  fetch ({ store, redirect }) {
+    if (!store.state.authUser) {
+      return redirect('/')
+    }
+  },
+  layout: 'template', 
+  components : {
+    moment,
+    axios,
+    DxDataGrid,DxFilterRow,DxHeaderFilter,DxPager,DxPaging,DxSummary,DxColumn,DxLookup,DxSearchPanel,DxExport,DxColumnChooser
+  },
+  data () {
+    return {
+      id:'',
+      lists: [],
+      pageSizes: [5, 10, 20],
+      stateData: [{'ID':'1','Name':'1단계'},{'ID':'2','Name':'2단계'},{'ID':'2','Name':'3단계'}]
+    }
+  },
+  mounted() {
+    this.getUserInfo()
+  },
+  methods: {
+    //사용자 정보 가져오기 
+    getUserInfo: async function() {
+      var vm = this;
+      axios.get('/api/user/info')
+      .then(function (res) {
+        if(res.data.code ===1) {
+          var temp = res.data.value
+          vm.userInfo =temp
+          vm.role = temp.role.name
+          vm.id = temp.id
+          //아이디 값에 해당하는 설정된 알람정보 가져오는 쿼리 실행
+          vm.getAlert()
+          }
+      })
+    },
+    getAlert: async function() {
+      var vm = this;
+      axios({
+            method: 'GET',
+            url : '/api/getAlarm',
+            params : {
+              id:vm.id
+            }
+      }).then((res)=> {
+        if(res.data.code === 1) {
+          console.log(res.data)
+          vm.lists = res.data.value
+        }else {
+
+        }
+      })
+      .catch((err)=> {
+        console.log("SearchAlert 에러 발생");
+        console.log(err);
+      })
+    }
+  }
+}
+</script>
+<style>
+.dx-datagrid, .dx-toolbar {background-color: transparent; font-size:14px;}
+  /**반응형코딩**/
+  @media screen and (max-width:767px) {
+    .dx-datagrid, .dx-toolbar {font-size:1em;}
+  }
+</style>
